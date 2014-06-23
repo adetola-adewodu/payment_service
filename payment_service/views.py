@@ -27,8 +27,8 @@ def post_credit_info(request):
 
     cvv = ''
     credit_card_number = 0
+    expiration_date = "1/15"
 
-    # Get the url redirect from braintree?
     json_data = json.loads(request.body)
     amount = json_data['amount']
 
@@ -41,7 +41,6 @@ def post_credit_info(request):
     if 'expiration_date' in json_data:
         expiration_date = json_data['expiration_date']
 
-    print credit_card_number
 
     result = braintree.Transaction.sale({
           "amount": amount,
