@@ -8,7 +8,8 @@ import json
 # Create stripe keys
 stripe.api_key = "sk_test_AP2VBnLI89bwW8K41ZmYqBHx"
 
-braintreeService = Service(name='braintree', path='/braintree', description="Brain tree resources")
+braintreeService = Service(name='braintree-credit-card', path='/card/add', description="Add credit card")
+braintreeCreditService = Service(name='Braintree Payment Code', path='/card/payment_method_code', description="Payment Code")
 stripeService = Service(name='stripe', path='/stripe', description="Stripe resources")
 
 
@@ -57,39 +58,45 @@ def post_credit_info(request):
     return {'success':result.is_success}
 
 
-@stripeService.post(content_type="application/json")
+@braintreeCreditService.post()
+def add_credit_card(request):
+
+    params = json.loads(request.body)
+
+    result = braintree.Customer.create({
+        "credit_card": {
+            "venmo_sdk_payment_method_code": params["payment_method_code"]
+        }
+    })
+
+    return {'success':result.is_success}
+
+
+
+
+@stripeService.post()
 def post_stripe_token(request):
 
-    json_data = json.loads(request.body)
-    amount = json_data['amount']
+    params = json.loads(request.body)
+    amount = 100
 
-    #print amount
-    #
-    #customer_id = json_data['customer_id']
-    #card_id = postdata.get('card_id','')
-
-    return {'amount':amount}
+    token = params['stripeToken']
 
 
-    #customer = stripe.Customer.retrieve("cus_4CgMqZZvGZJhSr")
-    #card = customer.cards.retrieve("card_104Cj82EUbF8A9mXsoFkxFxS")
-    #
-    #charge = stripe.Charge.create(
-    #  amount=int(amount*100),
-    #  currency="ngn", # I can Change to naira if needed
-    #  card=card,
-    #  description="Example charge"
-    #)
-    #
-    #
-    #
-    #if charge['card']['cvc_check']:
-    #    transaction_id = charge.id[3:22]
-    #    results = {'order_number': transaction_id, 'message': u'Money has been charged'}
-    #
-    #elif charge.balance_transaction:
-    #    results = {'order_number': 0, 'message': charge.failure_message, 'code': charge.failure_code,
-    #               'text': charge.description}
-    #else:
-    #    results = {'order_number': 0, 'message':charge.failure_message, 'errors': charge.errors}
-    #return results
+    charge = stripe.Charge.create(
+      amount=int(amount*100),
+      currency="usd", # I can Change to naira if needed
+      card=token,
+      description="Example charge"
+    )
+
+
+    if charge['card']['cvc_check']:
+        transaction_id = charge.id[3:22]
+        results = {'transaction_number': transaction_id, 'message': u'transaction good'}
+    elif charge.balance_transaction:
+        results = {'order_number': 0, 'message': charge.failure_message, 'code': charge.failure_code,
+                   'text': charge.description}
+    else:
+        results = {'order_number': 0, 'message':charge.failure_message, 'errors': charge.errors}
+    return results
