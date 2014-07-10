@@ -7,7 +7,6 @@ import json
 
 # Create stripe keys
 stripe.api_key = "sk_test_AP2VBnLI89bwW8K41ZmYqBHx"
-
 braintreeService = Service(name='braintree-credit-card', path='/card/add', description="Add credit card")
 braintreeCreditService = Service(name='Braintree Payment Code', path='/card/payment_method_code', description="Payment Code")
 stripeService = Service(name='stripe', path='/stripe', description="Stripe resources")
