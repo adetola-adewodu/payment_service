@@ -6,7 +6,7 @@ import stripe
 import json
 
 # Create stripe keys
-stripe.api_key = "sk_test_AP2VBnLI89bwW8K41ZmYqBHx"
+stripe.api_key = "Put your key"
 
 braintreeService = Service(name='braintree-credit-card', path='/card/add', description="Add credit card")
 braintreeCreditService = Service(name='Braintree Payment Code', path='/card/payment_method_code', description="Payment Code")
@@ -17,9 +17,9 @@ stripeService = Service(name='stripe', path='/stripe', description="Stripe resou
 # Braintree configuration
 braintree.Configuration.configure(
     braintree.Environment.Sandbox,
-    'c97c7xgtm7p9mhny',
-    'b6h83b422wzhmqxt',
-    'c4ad467826ffbe6e471262df1cce8394'
+    "the_merchant_id",
+    "the_public_key",
+    "the_private_key"
 )
 
 @braintreeService.post()
@@ -85,7 +85,7 @@ def post_stripe_token(request):
 
     charge = stripe.Charge.create(
       amount=int(amount*100),
-      currency="usd", # I can Change to naira if needed
+      currency="usd", # I can change to naira if needed
       card=token,
       description="Example charge"
     )
